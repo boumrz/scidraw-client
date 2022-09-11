@@ -17,18 +17,19 @@ const Canvas = observer(() => {
     const params = useParams()
 
     useEffect(() => {
-        canvasState.setCanvas(canvasRef.current)
         let ctx = canvasRef.current.getContext('2d')
+
+        canvasState.setCanvas(canvasRef.current)
         axios.get(`http://localhost:5001/image?id=${params.id}`)
             .then(response => {
-                const img = new Image()
-                img.src = response.data
+                const img = new Image();
+                img.src = response.data;
                 img.onload = () => {
-                    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
-                    ctx.drawImage(img, 0, 0, canvasRef.current.width, canvasRef.current.height)
-                }
-            })
-    }, [])
+                    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+                    ctx.drawImage(img, 0, 0, canvasRef.current.width, canvasRef.current.height);
+                };
+            });
+    }, []);
 
     useEffect(() => {
         if (canvasState.username) {
@@ -59,21 +60,21 @@ const Canvas = observer(() => {
     }, [canvasState.username])
 
     const drawHandler = (msg) => {
-        const figure = msg.figure
+        const figure = msg.figure;
         const ctx = canvasRef.current.getContext('2d')
         switch (figure.type) {
             case "brush":
-                Brush.draw(ctx, figure.x, figure.y)
-                break
+                Brush.draw(ctx, figure.x, figure.y, figure.color);
+                break;
             case "rect":
-                Rect.staticDraw(ctx, figure.x, figure.y, figure.width, figure.height, figure.color)
-                break
+                Rect.staticDraw(ctx, figure.x, figure.y, figure.width, figure.height, figure.color);
+                break;
             case "eraser":
-                Eraser.draw(ctx, figure.x, figure.y)
-                break
+                Eraser.draw(ctx, figure.x, figure.y, figure.color);
+                break;
             case "finish":
-                ctx.beginPath()
-                break
+                ctx.beginPath();
+                break;
         }
     }
 
@@ -104,7 +105,7 @@ const Canvas = observer(() => {
                     </Button>
                 </Modal.Footer>
             </Modal>
-            <canvas onMouseDown={() => mouseDownHandler()} ref={canvasRef} width={600} height={400}/>
+            <canvas id='canvas' onMouseDown={() => mouseDownHandler()} ref={canvasRef} width={2000} height={1400}/>
         </div>
     );
 });

@@ -10,7 +10,7 @@ export default class Brush extends Tool {
         this.canvas.onmouseup = this.mouseUpHandler.bind(this);
         this.canvas.onmousedown = this.mouseDownHandler.bind(this);
     }
-    mouseUpHandler(e) {
+    mouseUpHandler() {
         this.mouseDown = false;
         this.socket.send(JSON.stringify({
             method: 'draw',
@@ -32,6 +32,7 @@ export default class Brush extends Tool {
                 id: this.id,
                 figure: {
                     type: 'brush',
+                    color: this.ctx.fillStyle,
                     x: e.pageX - e.target.offsetLeft,
                     y: e.pageY - e.target.offsetTop,
                 }
@@ -39,8 +40,9 @@ export default class Brush extends Tool {
         }
     }
 
-    static draw(ctx, x, y) {
+    static draw(ctx, x, y, color) {
         ctx.lineTo(x, y);
         ctx.stroke();
+        ctx.strokeStyle = color;
     }
 }

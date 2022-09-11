@@ -30,9 +30,11 @@ const Toolbar = observer(() => {
     return (
         <div className="toolbar">
             <button className="toolbar__btn brush" onClick={
-                () => toolState.setTool(
-                    new Brush(canvasState.canvas, canvasState.socket, params.id)
-                )
+                () => {
+                    return toolState.setTool(
+                        new Brush(canvasState.canvas, canvasState.socket, params.id)
+                    );
+                }
             }/>
             <button className="toolbar__btn rect" onClick={() => toolState.setTool(new Rect(canvasState.canvas, canvasState.socket, params.id))}/>
             <button className="toolbar__btn circle" onClick={() => toolState.setTool(new Circle(canvasState.canvas, canvasState.socket, params.id))}/>
