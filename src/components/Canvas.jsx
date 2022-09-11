@@ -20,7 +20,8 @@ const Canvas = observer(() => {
         let ctx = canvasRef.current.getContext('2d')
 
         canvasState.setCanvas(canvasRef.current)
-        axios.get(`http://localhost:5001/image?id=${params.id}`)
+        // axios.get(`http://localhost:5001/image?id=${params.id}`)
+        axios.get(`https://scidraw-server.herokuapp.com/image?id=${params.id}`)
             .then(response => {
                 const img = new Image();
                 img.src = response.data;
@@ -33,7 +34,8 @@ const Canvas = observer(() => {
 
     useEffect(() => {
         if (canvasState.username) {
-            const socket = new WebSocket(`ws://localhost:5001/`);
+            // const socket = new WebSocket(`ws://localhost:5001/`);
+            const socket = new WebSocket('ws://scidraw-server.herokuapp.com');
             canvasState.setSocket(socket)
             canvasState.setSessionId(params.id)
             toolState.setTool(new Brush(canvasRef.current, socket, params.id))
@@ -81,8 +83,10 @@ const Canvas = observer(() => {
 
     const mouseDownHandler = () => {
         canvasState.pushToUndo(canvasRef.current.toDataURL())
-        axios.post(`http://localhost:5001/image?id=${params.id}`, {img: canvasRef.current.toDataURL()})
-            .then(response => console.log(response.data))
+        // axios.post(`http://localhost:5001/image?id=${params.id}`, {img: canvasRef.current.toDataURL()})
+        axios.post(`http://scidraw-server.herokuapp.com/image?id=${params.id}`, {
+            img: canvasRef.current.toDataURL(),
+        }).then(response => console.log(response.data));
     }
 
     const connectHandler = () => {
