@@ -21,7 +21,8 @@ const Canvas = observer(() => {
 
         canvasState.setCanvas(canvasRef.current)
         // axios.get(`http://localhost:5001/image?id=${params.id}`)
-        axios.get(`https://scidraw-server.herokuapp.com/image?id=${params.id}`)
+        // axios.get(`https://scidraw-server.herokuapp.com/image?id=${params.id}`)
+        axios.get(`https://scidraw.ru/image?id=${params.id}`)
             .then(response => {
                 const img = new Image();
                 img.src = response.data;
@@ -35,7 +36,8 @@ const Canvas = observer(() => {
     useEffect(() => {
         if (canvasState.username) {
             // const socket = new WebSocket(`ws://localhost:5001/`);
-            const socket = new WebSocket('ws://scidraw-server.herokuapp.com');
+            // const socket = new WebSocket('ws://scidraw-server.herokuapp.com');
+            const socket = new WebSocket('ws://scidraw.ru/ws');
             canvasState.setSocket(socket)
             canvasState.setSessionId(params.id)
             toolState.setTool(new Brush(canvasRef.current, socket, params.id))
@@ -78,20 +80,38 @@ const Canvas = observer(() => {
                 ctx.beginPath();
                 break;
         }
-    }
-
+    };
 
     const mouseDownHandler = () => {
-        canvasState.pushToUndo(canvasRef.current.toDataURL())
+        canvasState.pushToUndo(canvasRef.current.toDataURL());
         // axios.post(`http://localhost:5001/image?id=${params.id}`, {img: canvasRef.current.toDataURL()})
-        axios.post(`http://scidraw-server.herokuapp.com/image?id=${params.id}`, {
+        // axios.post(`http://scidraw-server.herokuapp.com/image?id=${params.id}`, {
+        axios.post(`http://scidraw.ru/image?id=${params.id}`, {
             img: canvasRef.current.toDataURL(),
         }).then(response => console.log(response.data));
     }
 
     const connectHandler = () => {
-        canvasState.setUsername(usernameRef.current.value)
-        setModal(false)
+        canvasState.setUsername(usernameRef.current.value);
+        setModal(false);
+    };
+
+    const moveCursorMarker = (event) => {
+        const pointerElem = document.getElementById('pointer');
+        let mouseX = event.pageX;
+        let mouseY = event.pageY;
+        let crd = canvasRef.current.getBoundingClientRect();
+        let activePointer = crd.left <= mouseX && mouseX <= crd.right && crd.top <= mouseY && mouseY <= crd.bottom;
+
+        requestAnimationFrame(function movePointer() {
+            if (activePointer) {
+                pointerElem.classList.remove('box-pointer-hidden');
+                pointerElem.style.left = Math.floor(mouseX) + 10 + 'px';
+                pointerElem.style.top = Math.floor(mouseY) + 10 + 'px';
+            } else {
+                pointerElem.classList.add('box-pointer-hidden');
+            }
+        });
     }
 
     return (
@@ -109,7 +129,8 @@ const Canvas = observer(() => {
                     </Button>
                 </Modal.Footer>
             </Modal>
-            <canvas id='canvas' onMouseDown={() => mouseDownHandler()} ref={canvasRef} width={2000} height={1400}/>
+            <div style={{position: 'absolute'}} id='pointer'>{canvasState.username}</div>
+            <canvas id='canvas' onMouseMove={(e) => moveCursorMarker(e)} onMouseDown={() => mouseDownHandler()} ref={canvasRef} width={2000} height={1400}/>
         </div>
     );
 });
